@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { SignInPage } from './auth';
+import { SignInPage, PrivateRoute } from './auth';
 import {
     CreateGroupPage,
     GroupPage,
@@ -11,31 +11,41 @@ import { NavBar } from './navigation';
 const routes = [{
     path: '/',
     Component: GroupsListPage,
+    private: true,
     exact: true,
 }, {
     path: '/groups/:id',
+    private: true,
     Component: GroupPage,
 }, {
     path: '/sign-in',
     Component: SignInPage,
 }, {
     path: '/create-group',
+    private: true,
     Component: CreateGroupPage,
 }];
 
-export const Routes = () => (
+export const Routes = ({ isLoading, user }) => (
     <Router>
-        <NavBar />
+        <NavBar user={user} />
         <Switch>
             {routes.map((route, index) => {
+                const RouteType = route.private
+                    ? PrivateRoute
+                    : Route;
+
                 return (
-                    <Route
+                    <RouteType
                         key={index}
                         path={route.path}
                         exact={route.exact}
+                        isLoading={isLoading}
+                        isAuthed={!!user}
                     >
                         <route.Component />
-                    </Route>)
+                    </RouteType>
+                );
             })}
         </Switch>
     </Router>
